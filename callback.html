@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Curiola Publisher — Authorization</title>
+<style>
+  body{max-width:720px;margin:48px auto;padding:0 22px;font:16px/1.7 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif;color:#1b1b1b}
+  h1{font-size:22px}
+  code{background:#f3f3f3;padding:2px 6px;border-radius:4px;word-break:break-all;font-size:13px}
+  .box{background:#fff8e6;border:1px solid #f0d48a;border-radius:10px;padding:16px 18px;margin:18px 0}
+  button{background:#f0a94a;border:0;border-radius:8px;padding:10px 16px;font-size:15px;cursor:pointer;font-weight:600}
+  button:hover{background:#e09a3c}
+  .ok{color:#1a7f37;font-weight:600}
+  .bad{color:#b42318;font-weight:600}
+  .muted{color:#777;font-size:13px}
+</style>
+</head>
+<body>
+<h1>Curiola Publisher — Authorization</h1>
+<div id="status">Reading the callback parameters…</div>
+
+<div id="okbox" class="box" style="display:none">
+  <p class="ok">Authorization code received.</p>
+  <p>Copy this code and paste it into the terminal:</p>
+  <code id="code"></code>
+  <p><button onclick="copyCode()">Copy code</button> <span id="copied" class="muted"></span></p>
+  <p class="muted">Or copy the whole address bar URL — the tool accepts either.</p>
+</div>
+
+<div id="errbox" class="box" style="display:none">
+  <p class="bad">Authorization failed.</p>
+  <code id="err"></code>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const code = params.get("code");
+const error = params.get("error");
+const desc = params.get("error_description");
+
+if (code) {
+  document.getElementById("status").textContent = "Signature verified — you can close this tab once you have copied the code.";
+  document.getElementById("okbox").style.display = "block";
+  document.getElementById("code").textContent = code;
+} else if (error) {
+  document.getElementById("status").textContent = "TikTok returned an error.";
+  document.getElementById("errbox").style.display = "block";
+  document.getElementById("err").textContent = error + (desc ? " — " + desc : "");
+} else {
+  document.getElementById("status").textContent =
+    "No code in the URL. This page only works right after TikTok redirects here with ?code=...";
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(code).then(() => {
+    document.getElementById("copied").textContent = "copied";
+    setTimeout(() => document.getElementById("copied").textContent = "", 2000);
+  }).catch(() => {
+    document.getElementById("copied").textContent = "select and copy manually";
+  });
+}
+</script>
+</body>
+</html>
